@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Typographer: Convert Spaces to nbsp</title>
+ <script type="text/javascript">
+  function displayFile () {
+   var fileInput = document.getElementById('fileInput');
+   var fileDisplayArea = document.getElementById('fileDisplayArea');
+
+   var file = fileInput.files[0];
+   var reader = new FileReader();
+
+   reader.onload = function(e) {
+       fileDisplayArea.innerHTML = '';
+       fileDisplayArea.value = e.target.result;
+       
+       fileInput.value = fileInput.defaultValue;
+   }
+
+   reader.readAsText(file);
+  }
+
+  function convertSpaces () {
+   var fileDisplayArea = document.getElementById('fileDisplayArea');
+   var text = fileDisplayArea.value;
+   
+   if (!text || !text.trim || !text.trim().length) {
+       console.warn('No input text!');
+       return;
+   }
+   
+   var textArr = (text.trim().replaceAll('\t', '    ').replaceAll('\r', '\n').replaceAll('\n', ' \n ').replaceAll('&amp;', '&').replaceAll('&nbsp;', ' ').replaceAll('<br>', '\n').replaceAll('<br/>', '\n').replaceAll('<BR>', '\n').replaceAll('<BR/>', '\n')/*.replace(/ +/g, ' ')*/).split(' ');
+   ///textArr = textArr.filter(function (e) { return !!e; });
+   
+   //console.log(textArr);
+   
+   let wasLineBreak = false;
+   var textNewArr;
+   textNewArr = textArr.map(function (e, i) {
+       if (!e || !e.trim || !e.trim().length || e.indexOf('\n') >= 0 || e.endsWith(',') || e.endsWith('.') || e.endsWith('!') || e.endsWith('?') || e.endsWith(':') || e.endsWith(';')) {
+           wasLineBreak = true;
+       } else {
+           wasLineBreak = false;
+       }
+       if (!wasLineBreak && e.length <= 3 && (''+e) != (''+(+e))) {
+           e = e + '&nbsp;';
+           //console.log(e);
+       } else if (wasLineBreak && !!e && !!e.trim && e.length >= 2 && ' ' === e[e.length - 2] && (e.endsWith(',') || e.endsWith('.') || e.endsWith('!') || e.endsWith('?') || e.endsWith(':') || e.endsWith(';'))) {
+           e = e.substring(0, e.length - 1) + '&nbsp;' + e.substring(e.length - 1);
+       }
+       return e;
+   });
+   
+   //console.log('textNewArr: ', textNewArr);
+
+   
+   var convertedText = textNewArr.join(' ').replace(/ \n /g, '\n').replace(/[&][n][b][s][p][;][ ]/g, '&nbsp;');
+   fileDisplayArea.innerHTML = '';
+   fileDisplayArea.value = convertedText;
+   
+   displayAfterConvert();
+   
+   navigator.clipboard.writeText(convertedText);
+  }
+  
+  function displayAfterConvert () {
+      if (!!document.getElementById('output')) {
+            document.getElementById('output').outerHTML = '';
+      }
+      
+      
+      
+      document.body.insertAdjacentHTML('beforeend', '<div id="output" style="width: 50%; height: auto;">' + (document.getElementById('fileDisplayArea').value.replace(/[&][a][m][p][;][n][b][s][p][;]/g, '\u00A0').replaceAll('\u00A0', '&nbsp;').replaceAll('&nbsp;', '\u00A0').replaceAll('\n', '<br/>')) + '</div>');
+      console.log(2);
+  }
+  
+  let wasStarted = false;
+  setTimeout(function update () {
+      if (wasStarted) {
+          return;
+      }
+      wasStarted = true;
+      try {
+          convertSpaces();
+      } catch (e) {
+      } finally {
+          wasStarted = false;
+      }
+  }, 100);
+ </script>
+</head>
+<body>
+ <h1 style="color: lightgrey;">Typographer: Convert Spaces to nbsp</h1>
+
+ <input type="file" id="fileInput" onchange="displayFile()" style="display:none;">
+ <label for="fileInput" style="cursor: pointer;"><h3>📁 [Press here]▭ Open file or paste text</h3></label>
+
+<!-- У леса на опушке жила Зима в избушке.	Она снежки солила в березовой кадушке,	Она сучила пряжу, она ткала холсты	Ковала ледяные да над реками мосты.		Припев:	Потолок ледяной, дверь скрипучая,	За шершавой стеной тьма колючая.	Как шагнешь за порог - всюду иней,	А из окон парок синий-синий.		Ходила на охоту, ковала серебро,	Сажала тонкий месяц в хрустальное ведро.	Деревьям шубы шила, торила санный путь,	А после в лес спешила, чтоб в избушке отдохнуть.		Припев:	Потолок ледяной, дверь скрипучая,	За шершавой стеной тьма колючая.	Как шагнешь за порог - всюду иней,	А из окон парок синий-синий. -->
+
+ <textarea id="fileDisplayArea" rows="10" cols="50" onchange="convertSpaces();"></textarea>
+
+ <button onclick="convertSpaces();">Convert and Copy</button>
+ 
+ <div id="output" style="width: 50%; height: auto;"></div>
+
+</body>
+</html>
