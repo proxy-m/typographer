@@ -62,6 +62,8 @@
 
    
    var convertedText = textNewArr.join(' ').replace(/ \n /g, '\n').replace(/[&][n][b][s][p][;][ ]/g, '&nbsp;');
+   convertedText = convertedText.replaceAll('\n', !!document.getElementById('brInsteadN').checked ? '<br/>' : '\n');
+   
    fileDisplayArea.innerHTML = '';
    fileDisplayArea.value = convertedText;
    
@@ -102,6 +104,9 @@
   
   document.addEventListener('keydown', function (e) {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A' || String.fromCharCode(e.which || e.keyCode).toLowerCase() === 'a')) {
+          if (!e.target.placeholder) {
+              return;
+          }
           e.preventDefault();
           console.log('CTRL + A');
           e.target.select();  //selectElementContents(e.target);
@@ -180,6 +185,9 @@
 
  <input type="number" id="prepositionWorldLen" value="3" style="width: 30px;" onchange="document.getElementById('fileDisplayArea').innerHTML = '';  document.getElementById('fileDisplayArea').value = '';" />
  <label for="prepositionWorldLen" title="Длина предлога (максимальная)">Preposition world length (maximum)</label>
+ 
+ <input type="checkbox" id="brInsteadN" style="width: 30px;" onchange="convertSpaces();" />
+ <label for="brInsteadN">Use html BR instead N (new line)</label>
 
  <input type="file" id="fileInput" onchange="displayFile()" style="display:none;">
  <label for="fileInput" style="cursor: pointer;"><h3>📁 [Press here]▭ Open file or paste text</h3></label>
