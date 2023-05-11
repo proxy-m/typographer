@@ -3,6 +3,8 @@
 <head>
  <meta charset="utf-8">
  <title>Typographer: Convert Spaces to nbsp</title>
+ <script type="text/javascript" src="./deps/js/zepto.min.js"></script><!-- like simplified jquery -->
+ 
  <script type="text/javascript">
      let fileDisplayArea = null;
      let pauseR = false;
@@ -69,8 +71,8 @@
      );
      
   function displayFile () {
-   var fileInput = document.getElementById('fileInput');
-   fileDisplayArea = document.getElementById('fileDisplayArea');
+   var fileInput = $('#fileInput')[0];
+   fileDisplayArea = $('#fileDisplayArea')[0];
 
    var file = fileInput.files[0];
    var reader = new FileReader();
@@ -90,7 +92,7 @@
       if (pauseR) {
           return;
       }
-   fileDisplayArea = document.getElementById('fileDisplayArea');
+   fileDisplayArea = $('#fileDisplayArea')[0];
    var text = fileDisplayArea.value;
    
    if (!text || !text.trim || !text.trim().length) {
@@ -111,7 +113,7 @@
        } else {
            wasLineBreak = false;
        }
-       if (!wasLineBreak && (e.length <= (document.getElementById('prepositionWorldLen').value || 3) && blackListWords.indexOf(e.toLowerCase()) < 0) && (''+e) != (''+(+e))) { // main condition
+       if (!wasLineBreak && (e.length <= ($('#prepositionWorldLen')[0].value || 3) && blackListWords.indexOf(e.toLowerCase()) < 0) && (''+e) != (''+(+e))) { // main condition
            e = e + '&nbsp;';
            //console.log(e);
        } else if (wasLineBreak && !!e && !!e.trim && e.length >= 2 && ' ' === e[e.length - 2] && (e.endsWith(',') || e.endsWith('.') || e.endsWith('!') || e.endsWith('?') || e.endsWith(':') || e.endsWith(';'))) {
@@ -132,7 +134,7 @@
    displayAfterConvert();
    
    navigator.clipboard.writeText(convertedText);
-   document.getElementById('fileDisplayArea').placeholder = 'RESULT ALREADY IN CLIPBOARD (BUFFERED)';
+   $('#fileDisplayArea')[0].placeholder = 'RESULT ALREADY IN CLIPBOARD (BUFFERED)';
   }
   
   function displayAfterConvert () {
@@ -214,7 +216,7 @@
           document.getElementById('fileDisplayArea').blur();
           
           setTimeout(function() {
-              fileDisplayArea = document.getElementById('fileDisplayArea');
+              fileDisplayArea = $('#fileDisplayArea')[0];
               fileDisplayArea.parentElement.focus();
               fileDisplayArea.focus();
               pauseR = false;
@@ -245,11 +247,15 @@
 <body>
  <h1 style="color: lightgrey;">Typographer: Convert Spaces to nbsp</h1>
 
- <input type="number" id="prepositionWorldLen" value="3" style="width: 30px;" onchange="document.getElementById('fileDisplayArea').innerHTML = '';  document.getElementById('fileDisplayArea').value = '';" />
+ <input type="number" id="prepositionWorldLen" value="3" style="width: 30px;" onchange="$('#fileDisplayArea')[0].innerHTML = '';  $('#fileDisplayArea')[0].value = '';" />
  <label for="prepositionWorldLen" title="Длина предлога (максимальная)">Preposition world length (maximum)</label>
  
  <input type="checkbox" id="brInsteadN" style="width: 30px;" onchange="convertSpaces();" />
- <label for="brInsteadN">Use html BR instead N (new line)</label>
+ <label for="brInsteadN">Use html BR instead N (new line)</label><br/>
+ 
+ <input type="text" id="blackListWords" disabled />
+ <label for="blackListWords">Comma-separated black list (excluded)</label><br/>
+
 
  <input type="file" id="fileInput" onchange="displayFile()" style="display:none;">
  <label for="fileInput" style="cursor: pointer;"><h3>📁 [Press here]▭ Open file or paste text</h3></label>
